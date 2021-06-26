@@ -1,6 +1,5 @@
 package com.tobmistaketracker.detector;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.tobmistaketracker.TobBossNames;
 import com.tobmistaketracker.TobMistake;
@@ -9,18 +8,15 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Actor;
 import net.runelite.api.NPC;
-import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ActorDeath;
-import net.runelite.api.events.GraphicsObjectCreated;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.NpcSpawned;
+import net.runelite.api.events.ProjectileMoved;
 import net.runelite.client.eventbus.Subscribe;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -87,6 +83,34 @@ public class SotesegMistakeDetector extends BaseTobMistakeDetector {
                 shutdown();
             }
         }
+    }
+
+    @Subscribe
+    public void onProjectileMoved(ProjectileMoved event) {
+        if (!ORB_PROJECTILE_IDS.contains(event.getProjectile().getId())) return;
+
+        if (event.getProjectile().getRemainingCycles() >= 200) {
+            logProjectileMoved(event);
+        } else if (event.getProjectile().getRemainingCycles() <= 30) {
+            logProjectileMoved(event);
+        }
+    }
+
+    // TODO: REMOVE
+    @Subscribe
+    public void onGameTick(GameTick event) {
+        if (!detectingMistakes) return;
+
+        NPC sot = client.getNpcs().stream().filter(n -> TobBossNames.SOTETSEG.equals(n.getName())).findFirst().get();
+        sot.setOverheadText("" + client.getTickCount());
+    }
+
+    // TODO: REMOVE
+    private void logProjectileMoved(ProjectileMoved event) {
+        log.info(String.format("%s - ProjectileMoved: %s - Position: %s Remaining Cycles: %s - X1: %s Y1: %s",
+                client.getTickCount(), event.getProjectile().getId(), event.getPosition(),
+                event.getProjectile().getRemainingCycles(),
+                event.getProjectile().getX1(), event.getProjectile().getY1()));
     }
 
     private boolean isAlreadySpawned() {
