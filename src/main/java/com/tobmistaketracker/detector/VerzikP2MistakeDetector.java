@@ -1,5 +1,6 @@
 package com.tobmistaketracker.detector;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.tobmistaketracker.TobBossNames;
 import com.tobmistaketracker.TobMistake;
 import com.tobmistaketracker.TobRaider;
@@ -21,6 +22,7 @@ import net.runelite.client.eventbus.Subscribe;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,10 +35,10 @@ import java.util.Set;
 @Singleton
 public class VerzikP2MistakeDetector extends BaseTobMistakeDetector {
 
-    private final int VERZIK_P2_POSE_ANIMATION_ID = 8113;
-    private final int VERZIK_BOMB_GRAPHICS_OBJECT_ID = 1584;
-    private final int PLAYER_BOUNCE_ANIMATION_ID = 1157;
-    private final int VERZIK_ACID_GAME_OBJECT_ID = 41747;
+    private static final int VERZIK_P2_POSE_ANIMATION_ID = 8113;
+    private static final int VERZIK_BOMB_GRAPHICS_OBJECT_ID = 1584;
+    private static final int PLAYER_BOUNCE_ANIMATION_ID = 1157;
+    private static final int VERZIK_ACID_GAME_OBJECT_ID = 41747;
 
     private final Set<WorldPoint> activeBombTiles;
 
@@ -155,10 +157,15 @@ public class VerzikP2MistakeDetector extends BaseTobMistakeDetector {
     }
 
     private boolean isAlreadySpawned() {
-        return client.getNpcs().stream().anyMatch(this::isVerzikP2);
+        return client.getNpcs().stream().anyMatch(VerzikP2MistakeDetector::isVerzikP2);
     }
 
-    private boolean isVerzikP2(Actor actor) {
+    private static boolean isVerzikP2(Actor actor) {
         return TobBossNames.VERZIK.equals(actor.getName()) && actor.getPoseAnimation() == VERZIK_P2_POSE_ANIMATION_ID;
+    }
+
+    @VisibleForTesting
+    public Set<WorldPoint> getVerzikP2AcidTiles() {
+        return Collections.unmodifiableSet(activeAcidTiles);
     }
 }
