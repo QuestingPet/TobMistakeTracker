@@ -37,12 +37,12 @@ public class MistakeDetectorManager {
     public MistakeDetectorManager(DeathMistakeDetector deathMistakeDetector,
                                   MaidenMistakeDetector maidenMistakeDetector,
                                   BloatMistakeDetector bloatMistakeDetector,
-                                  SotesegMistakeDetector sotesegMistakeDetector) {
+                                  SotetsegMistakeDetector sotetsegMistakeDetector) {
         // Order matters -- death should be last
         this.mistakeDetectors = new ArrayList<>(Arrays.asList(
                 maidenMistakeDetector,
                 bloatMistakeDetector,
-                sotesegMistakeDetector,
+                sotetsegMistakeDetector,
                 deathMistakeDetector));
         this.started = false;
     }

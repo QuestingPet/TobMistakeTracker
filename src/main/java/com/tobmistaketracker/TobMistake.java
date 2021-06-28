@@ -9,7 +9,8 @@ import java.awt.image.BufferedImage;
 public enum TobMistake {
     DEATH("Death", "death.png", "I'm planking!"),
     MAIDEN_BLOOD("Maiden Blood", "maiden_blood.png", "I'm drowning in Maiden's blood!"),
-    BLOAT_HAND("Bloat Hand", "bloat_hand.png", "I'm stunned!");
+    BLOAT_HAND("Bloat Hand", "bloat_hand.png", "I'm stunned!"),
+    SOTETSEG_ORB("Sotetseg Orb", "death.png", "I've been injured and can't use protection prayers!");
 
     @Getter
     @NonNull
