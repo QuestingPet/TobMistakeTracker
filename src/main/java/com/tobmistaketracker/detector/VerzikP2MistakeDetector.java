@@ -11,10 +11,11 @@ import net.runelite.api.Player;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ActorDeath;
 import net.runelite.api.events.AnimationChanged;
+import net.runelite.api.events.GameObjectDespawned;
+import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GraphicsObjectCreated;
 import net.runelite.api.events.NpcChanged;
 import net.runelite.api.events.NpcSpawned;
-import net.runelite.api.events.PlayerChanged;
 import net.runelite.client.eventbus.Subscribe;
 
 import javax.inject.Inject;
@@ -25,7 +26,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Verzik P2 is pretty straightforward. Detect the specific game objects/graphics objects/animations and we're done.
+ * Currently this tracks bounces, bombs, and acid tiles.
  */
 @Slf4j
 @Singleton
@@ -33,12 +35,13 @@ public class VerzikP2MistakeDetector extends BaseTobMistakeDetector {
 
     private final int VERZIK_P2_POSE_ANIMATION_ID = 8113;
     private final int VERZIK_BOMB_GRAPHICS_OBJECT_ID = 1584;
-    private final int VERZIK_BOUNCE_ANIMATION_ID = 8116;
     private final int PLAYER_BOUNCE_ANIMATION_ID = 1157;
-
-    // TODO: acid hm
+    private final int VERZIK_ACID_GAME_OBJECT_ID = 41747;
 
     private final Set<WorldPoint> activeBombTiles;
+
+    private final Set<WorldPoint> activeAcidTiles;
+    private final Set<WorldPoint> acidTilesToRemove;
 
     // AFAIK you can only have one person bounced per tick, but just in case that ever changes...
     private final Set<String> playerNamesBounced;
@@ -46,6 +49,8 @@ public class VerzikP2MistakeDetector extends BaseTobMistakeDetector {
     @Inject
     public VerzikP2MistakeDetector() {
         activeBombTiles = new HashSet<>();
+        activeAcidTiles = new HashSet<>();
+        acidTilesToRemove = new HashSet<>();
         playerNamesBounced = new HashSet<>();
     }
 
@@ -53,6 +58,8 @@ public class VerzikP2MistakeDetector extends BaseTobMistakeDetector {
     public void shutdown() {
         super.shutdown();
         activeBombTiles.clear();
+        activeAcidTiles.clear();
+        acidTilesToRemove.clear();
         playerNamesBounced.clear();
     }
 
@@ -75,7 +82,9 @@ public class VerzikP2MistakeDetector extends BaseTobMistakeDetector {
             mistakes.add(TobMistake.VERZIK_P2_BOMB);
         }
 
-        // TODO: Acid
+        if (activeAcidTiles.contains(raider.getPreviousWorldLocation())) {
+            mistakes.add(TobMistake.VERZIK_P2_ACID);
+        }
 
         // Currently, there doesn't seem to be a way to be both bombed *and* bounced on the same tick, but let's
         // write it up this way anyway in case that ever changes, since it's not a problem to do so.
@@ -89,6 +98,8 @@ public class VerzikP2MistakeDetector extends BaseTobMistakeDetector {
     @Override
     public void afterDetect() {
         activeBombTiles.clear();
+        activeAcidTiles.removeAll(acidTilesToRemove);
+        acidTilesToRemove.clear();
         playerNamesBounced.clear();
     }
 
@@ -101,8 +112,22 @@ public class VerzikP2MistakeDetector extends BaseTobMistakeDetector {
     }
 
     @Subscribe
+    public void onGameObjectSpawned(GameObjectSpawned event) {
+        if (event.getGameObject().getId() == VERZIK_ACID_GAME_OBJECT_ID) {
+            activeAcidTiles.add(event.getGameObject().getWorldLocation());
+        }
+    }
+
+    @Subscribe
+    public void onGameObjectDespawned(GameObjectDespawned event) {
+        if (event.getGameObject().getId() == VERZIK_ACID_GAME_OBJECT_ID) {
+            // Remove these *after* detecting this tick, since they were still present in the previous player location.
+            acidTilesToRemove.add(event.getGameObject().getWorldLocation());
+        }
+    }
+
+    @Subscribe
     public void onAnimationChanged(AnimationChanged event) {
-        log.info("onAnimationChanged " + event.getActor().getName() + " - " + event.getActor().getAnimation());
         if (event.getActor() instanceof Player && event.getActor().getAnimation() == PLAYER_BOUNCE_ANIMATION_ID) {
             playerNamesBounced.add(event.getActor().getName());
         }
@@ -110,7 +135,6 @@ public class VerzikP2MistakeDetector extends BaseTobMistakeDetector {
 
     @Subscribe
     public void onNpcSpawned(NpcSpawned event) {
-        log.info("onNpcSpawned " + event.getActor().getName() + " - " + event.getActor().getPoseAnimation());
         if (!detectingMistakes && isVerzikP2(event.getActor())) {
             detectingMistakes = true;
         }
@@ -118,7 +142,6 @@ public class VerzikP2MistakeDetector extends BaseTobMistakeDetector {
 
     @Subscribe
     public void onNpcChanged(NpcChanged event) {
-        log.info("onNpcChanged " + event.getNpc().getName() + " - " + event.getNpc().getPoseAnimation());
         if (!detectingMistakes && isVerzikP2(event.getNpc())) {
             detectingMistakes = true;
         }
