@@ -80,12 +80,13 @@ public class VerzikP2MistakeDetector extends BaseTobMistakeDetector {
             return mistakes;
         }
 
-        if (activeBombTiles.contains(raider.getPreviousWorldLocation())) {
-            mistakes.add(TobMistake.VERZIK_P2_BOMB);
-        }
-
+        // Put acid mistake first, so if acid and bomb happen on the same tick, the chat overhead is for the latter.
         if (activeAcidTiles.contains(raider.getPreviousWorldLocation())) {
             mistakes.add(TobMistake.VERZIK_P2_ACID);
+        }
+
+        if (activeBombTiles.contains(raider.getPreviousWorldLocation())) {
+            mistakes.add(TobMistake.VERZIK_P2_BOMB);
         }
 
         // Currently, there doesn't seem to be a way to be both bombed *and* bounced on the same tick, but let's
