@@ -12,7 +12,8 @@ import java.util.Set;
  */
 class MistakeManager {
 
-    private final Map<String, Map<TobMistake, Integer>> mistakesForPlayers;
+    // TODO: Refactor to Map<String, PlayerTrackingInfo>
+    private final Map<String, PlayerTrackingInfo> mistakesForPlayers;
 
     MistakeManager() {
         mistakesForPlayers = new HashMap<>();
