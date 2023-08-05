@@ -1,13 +1,11 @@
 package com.tobmistaketracker.detector;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableSet;
 import com.tobmistaketracker.TobBossNames;
 import com.tobmistaketracker.TobMistake;
 import com.tobmistaketracker.TobRaider;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Actor;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
 import net.runelite.api.coords.WorldPoint;
@@ -40,7 +38,11 @@ import java.util.Set;
 @Singleton
 public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
 
-    private static final Set<Integer> VERZIK_P3_POSE_ANIMATION_IDS = ImmutableSet.of(8120, 8121);
+    private static final Set<Integer> VERZIK_P3_IDS = Set.of(
+            10835, // Entry
+            8374, // Normal
+            10852 // Hard
+    );
 
     private static final int VERZIK_WEB_GAME_OBJECT_ID = 32734;
     private static final int PLAYER_PURPLE_GRAPHIC_ID = 1602;
@@ -111,7 +113,7 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
 
     @Subscribe
     public void onNpcSpawned(NpcSpawned event) {
-        if (!detectingMistakes && isVerzikP3(event.getActor())) {
+        if (!detectingMistakes && isVerzikP3(event.getNpc())) {
             detectingMistakes = true;
         }
     }
@@ -140,7 +142,7 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
 
     @Subscribe
     public void onActorDeath(ActorDeath event) {
-        if (event.getActor() instanceof NPC && isVerzikP3(event.getActor())) {
+        if (event.getActor() instanceof NPC && isVerzikP3((NPC) event.getActor())) {
             shutdown();
         }
     }
@@ -149,8 +151,8 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
         return client.getNpcs().stream().anyMatch(VerzikP3MistakeDetector::isVerzikP3);
     }
 
-    private static boolean isVerzikP3(Actor actor) {
-        return TobBossNames.VERZIK.equals(actor.getName()) && VERZIK_P3_POSE_ANIMATION_IDS.contains(actor.getPoseAnimation());
+    private static boolean isVerzikP3(NPC npc) {
+        return TobBossNames.VERZIK.equals(npc.getName()) && VERZIK_P3_IDS.contains(npc.getId());
     }
 
     @VisibleForTesting

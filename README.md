@@ -41,6 +41,9 @@ Coming Soon:
 
 ## Changes
 
+#### 2.3
+* Fix issue where Verzik mistakes were not being detected
+
 #### 2.2
 * Fix issue where malformed mistake-state file would cause plugin to not load
 

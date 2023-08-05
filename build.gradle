@@ -10,7 +10,7 @@ repositories {
 	mavenCentral()
 }
 
-def runeLiteVersion = '1.8.2'
+def runeLiteVersion = 'latest.release'
 
 dependencies {
 	compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
@@ -21,13 +21,10 @@ dependencies {
 	testImplementation 'junit:junit:4.12'
 	testImplementation group: 'net.runelite', name:'client', version: runeLiteVersion
 	testImplementation group: 'net.runelite', name:'jshell', version: runeLiteVersion
-
-	testCompile group: 'org.mockito', name: 'mockito-core', version: '2.23.4'
-	testCompile group: 'com.google.inject.extensions', name: 'guice-testlib', version: '4.1.0'
 }
 
 group = 'com.tobmistaketracker'
-version = '2.2'
+version = '2.3'
 sourceCompatibility = '1.8'
 
 tasks.withType(JavaCompile) {

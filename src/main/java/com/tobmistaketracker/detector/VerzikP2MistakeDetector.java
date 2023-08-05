@@ -6,7 +6,6 @@ import com.tobmistaketracker.TobMistake;
 import com.tobmistaketracker.TobRaider;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Actor;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
 import net.runelite.api.coords.WorldPoint;
@@ -35,10 +34,14 @@ import java.util.Set;
 @Singleton
 public class VerzikP2MistakeDetector extends BaseTobMistakeDetector {
 
-    private static final int VERZIK_P2_POSE_ANIMATION_ID = 8113;
     private static final int VERZIK_BOMB_GRAPHICS_OBJECT_ID = 1584;
     private static final int PLAYER_BOUNCE_ANIMATION_ID = 1157;
     private static final int VERZIK_ACID_GAME_OBJECT_ID = 41747;
+    private static final Set<Integer> VERZIK_P2_IDS = Set.of(
+            10833, // Entry
+            8372, // Normal
+            10850 // Hard
+    );
 
     private final Set<WorldPoint> activeBombTiles;
 
@@ -138,7 +141,7 @@ public class VerzikP2MistakeDetector extends BaseTobMistakeDetector {
 
     @Subscribe
     public void onNpcSpawned(NpcSpawned event) {
-        if (!detectingMistakes && isVerzikP2(event.getActor())) {
+        if (!detectingMistakes && isVerzikP2(event.getNpc())) {
             detectingMistakes = true;
         }
     }
@@ -152,7 +155,7 @@ public class VerzikP2MistakeDetector extends BaseTobMistakeDetector {
 
     @Subscribe
     public void onActorDeath(ActorDeath event) {
-        if (event.getActor() instanceof NPC && isVerzikP2(event.getActor())) {
+        if (event.getActor() instanceof NPC && isVerzikP2((NPC) event.getActor())) {
             shutdown();
         }
     }
@@ -161,8 +164,8 @@ public class VerzikP2MistakeDetector extends BaseTobMistakeDetector {
         return client.getNpcs().stream().anyMatch(VerzikP2MistakeDetector::isVerzikP2);
     }
 
-    private static boolean isVerzikP2(Actor actor) {
-        return TobBossNames.VERZIK.equals(actor.getName()) && actor.getPoseAnimation() == VERZIK_P2_POSE_ANIMATION_ID;
+    private static boolean isVerzikP2(NPC npc) {
+        return TobBossNames.VERZIK.equals(npc.getName()) && VERZIK_P2_IDS.contains(npc.getId());
     }
 
     @VisibleForTesting
