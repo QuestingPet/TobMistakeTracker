@@ -351,7 +351,7 @@ public class TobMistakeTrackerPlugin extends Plugin {
     private void computeInTob() {
         if (client.getGameState() != GameState.LOGGED_IN) return;
 
-        int newRaidState = client.getVar(Varbits.THEATRE_OF_BLOOD);
+        int newRaidState = client.getVarbitValue(Varbits.THEATRE_OF_BLOOD);
         if (raidState != newRaidState) {
             if (newRaidState == TOB_STATE_NO_PARTY || newRaidState == TOB_STATE_IN_PARTY) {
                 // We're not in a raid
