@@ -41,6 +41,10 @@ Coming Soon:
 
 ## Changes
 
+#### 2.4
+
+* Update Side Panel for RuneLite's new Look and Feel (FlatLaf)
+
 #### 2.3
 * Fix issue where Verzik mistakes were not being detected
 
