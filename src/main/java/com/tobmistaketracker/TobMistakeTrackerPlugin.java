@@ -47,7 +47,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static net.runelite.api.widgets.WidgetID.TOB_GROUP_ID;
+import static net.runelite.api.widgets.InterfaceID.TOB;
 
 @Singleton
 @Slf4j
@@ -386,7 +386,7 @@ public class TobMistakeTrackerPlugin extends Plugin {
      * @return The text shown on the screen from the tob widget when entering a new room, or empty string if none
      */
     public static String getTobRoomEnterText(final Client client) {
-        Widget widget = client.getWidget(TOB_GROUP_ID, TOB_BOSS_INTERFACE_ID);
+        Widget widget = client.getWidget(TOB, TOB_BOSS_INTERFACE_ID);
         if (widget != null && widget.getChild(TOB_BOSS_INTERFACE_TEXT_ID) != null) {
             Widget childWidget = widget.getChild(TOB_BOSS_INTERFACE_TEXT_ID);
             return childWidget.getText();
