@@ -41,6 +41,10 @@ Coming Soon:
 
 ## Changes
 
+#### 2.5
+
+* Added Verzik Melee chance as mistake
+
 #### 2.4
 
 * Update Side Panel for RuneLite's new Look and Feel (FlatLaf)
