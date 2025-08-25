@@ -68,7 +68,7 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
     @Override
     protected void computeDetectingMistakes() {
         if (!detectingMistakes && isAlreadySpawned()) {
-            detectingMistakes = true;
+            enableDetectingMistakes();
         }
     }
 
@@ -104,6 +104,7 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
         activeWebTiles.removeAll(webTilesToRemove);
         webTilesToRemove.clear();
         playerNamesPurpled.clear();
+        verzikP3NPC = null;
         verzikMeleeChancedTracker.setPlayerThatChancedMelee(null);
     }
 
@@ -116,12 +117,9 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
 
     @Subscribe
     public void onGameTick(GameTick tick) {
-        verzikP3NPC = client.getNpcs().stream()
-                .filter(VerzikP3MistakeDetector::isVerzikP3)
-                .findFirst()
-                .orElse(null);
-
-        verzikMeleeChancedTracker.setVerzikAttackInfo(verzikP3NPC);
+        if (verzikP3NPC != null) {
+            verzikMeleeChancedTracker.setVerzikAttackInfo(verzikP3NPC);
+        }
     }
 
     @Subscribe
@@ -134,7 +132,7 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
     @Subscribe
     public void onNpcSpawned(NpcSpawned event) {
         if (!detectingMistakes && isVerzikP3(event.getNpc())) {
-            detectingMistakes = true;
+            enableDetectingMistakes();
         }
     }
 
@@ -156,7 +154,7 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
     @Subscribe
     public void onNpcChanged(NpcChanged event) {
         if (!detectingMistakes && isVerzikP3(event.getNpc())) {
-            detectingMistakes = true;
+            enableDetectingMistakes();
         }
     }
 
@@ -173,6 +171,15 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
 
     private static boolean isVerzikP3(NPC npc) {
         return TobBossNames.VERZIK.equals(npc.getName()) && VERZIK_P3_IDS.contains(npc.getId());
+    }
+
+    private void enableDetectingMistakes() {
+        detectingMistakes = true;
+
+        verzikP3NPC = client.getNpcs().stream()
+                .filter(VerzikP3MistakeDetector::isVerzikP3)
+                .findFirst()
+                .orElse(null);
     }
 
     @VisibleForTesting
