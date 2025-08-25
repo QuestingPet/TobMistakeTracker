@@ -68,7 +68,7 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
     @Override
     protected void computeDetectingMistakes() {
         if (!detectingMistakes && isAlreadySpawned()) {
-            enableDetectingMistakes();
+            detectingMistakes = true;
         }
     }
 
@@ -116,6 +116,11 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
 
     @Subscribe
     public void onGameTick(GameTick tick) {
+        verzikP3NPC = client.getNpcs().stream()
+                .filter(VerzikP3MistakeDetector::isVerzikP3)
+                .findFirst()
+                .orElse(null);
+
         verzikMeleeChancedTracker.setVerzikAttackInfo(verzikP3NPC);
     }
 
@@ -151,7 +156,7 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
     @Subscribe
     public void onNpcChanged(NpcChanged event) {
         if (!detectingMistakes && isVerzikP3(event.getNpc())) {
-            enableDetectingMistakes();
+            detectingMistakes = true;
         }
     }
 
@@ -168,15 +173,6 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
 
     private static boolean isVerzikP3(NPC npc) {
         return TobBossNames.VERZIK.equals(npc.getName()) && VERZIK_P3_IDS.contains(npc.getId());
-    }
-
-    private void enableDetectingMistakes() {
-        detectingMistakes = true;
-
-        verzikP3NPC = client.getNpcs().stream()
-                .filter(VerzikP3MistakeDetector::isVerzikP3)
-                .findFirst()
-                .orElse(null);
     }
 
     @VisibleForTesting
