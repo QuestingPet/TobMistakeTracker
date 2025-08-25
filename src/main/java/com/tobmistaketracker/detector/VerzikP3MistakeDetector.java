@@ -91,7 +91,7 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
         }
 
         String chancedMeleePlayer = verzikMeleeChancedTracker.getPlayerThatChancedMelee();
-        if (chancedMeleePlayer.equals(raider.getName())) {
+        if (chancedMeleePlayer != null && chancedMeleePlayer.equals(raider.getName())) {
             verzikMeleeChancedTracker.setPlayerThatChancedMelee(null);
             mistakes.add(TobMistake.VERZIK_P3_MELEE_CHANCED);
         }
