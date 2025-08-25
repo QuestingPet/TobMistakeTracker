@@ -29,48 +29,38 @@ public class VerzikMeleeChancedTracker {
             AnimationID.VERZIK_PHASE3_ATTACK_RANGED
     );
 
-    public void setVerzikAttackInfo(NPC verzik){
-        if (verzik == null)
-        {
+    public void setVerzikAttackInfo(NPC verzik) {
+        if (verzik == null) {
             emptyTickData();
         } else {
             Actor target = verzik.getInteracting();
-            if (target instanceof Player)
-            {
+            if (target instanceof Player) {
                 lastTickTarget = target.getName();
                 lastTickTargetArea = target.getWorldArea();
                 lastTickVerzikArea = verzik.getWorldArea();
-            }
-            else
-            {
+            } else {
                 emptyTickData();
             }
         }
     }
 
-    public void checkPlayerWronglyTanked(AnimationChanged event)
-    {
+    public void checkPlayerWronglyTanked(AnimationChanged event) {
         int animationId = event.getActor().getAnimation();
 
-        if (VERZIK_ATTACK_ANIMATIONS.contains(animationId))
-        {
-            if (lastTickTarget != null && lastTickTargetArea != null && lastTickVerzikArea != null)
-            {
-                if (isWronglyTanked(lastTickVerzikArea, lastTickTargetArea))
-                {
+        if (VERZIK_ATTACK_ANIMATIONS.contains(animationId)) {
+            if (lastTickTarget != null && lastTickTargetArea != null && lastTickVerzikArea != null) {
+                if (isWronglyTanked(lastTickVerzikArea, lastTickTargetArea)) {
                     playerThatChancedMelee = lastTickTarget;
                 }
             }
         }
     }
 
-    private boolean isWronglyTanked(WorldArea verzikArea, WorldArea tankArea)
-    {
+    private boolean isWronglyTanked(WorldArea verzikArea, WorldArea tankArea) {
         return !verzikArea.intersectsWith(tankArea) && verzikArea.distanceTo(tankArea) == 1;
     }
 
-    private void emptyTickData()
-    {
+    private void emptyTickData() {
         lastTickTarget = null;
         lastTickTargetArea = null;
         lastTickVerzikArea = null;

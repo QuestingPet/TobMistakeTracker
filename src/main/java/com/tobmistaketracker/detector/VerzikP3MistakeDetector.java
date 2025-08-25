@@ -23,10 +23,10 @@ import java.util.Set;
 
 /**
  * Verzik P3 is also pretty straightforward -- detect for webs/purples and show them.
- *
+ * <p>
  * We are intentionally waiting until the web has *despawned* and checking if a player was standing on it in order
  * to combat any form of "cheating" where the mistake detection can be seen as a communication mechanic.
- *
+ * <p>
  * In the future, this will also add verzik melee for the player tanking, but we currently can't easily
  * detect when verzik is meleeing, unless the dev team unmask certain animations/graphics for P3.
  */
@@ -91,7 +91,7 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
         }
 
         String chancedMeleePlayer = verzikMeleeChancedTracker.getPlayerThatChancedMelee();
-        if (chancedMeleePlayer.equals(raider.getName())){
+        if (chancedMeleePlayer.equals(raider.getName())) {
             verzikMeleeChancedTracker.setPlayerThatChancedMelee(null);
             mistakes.add(TobMistake.VERZIK_P3_MELEE_CHANCED);
         }
@@ -115,16 +115,13 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
     }
 
     @Subscribe
-    public void onGameTick(GameTick tick)
-    {
+    public void onGameTick(GameTick tick) {
         verzikMeleeChancedTracker.setVerzikAttackInfo(verzikP3NPC);
     }
 
     @Subscribe
-    public void onAnimationChanged(AnimationChanged event)
-    {
-        if (event.getActor() instanceof NPC)
-        {
+    public void onAnimationChanged(AnimationChanged event) {
+        if (event.getActor() instanceof NPC) {
             verzikMeleeChancedTracker.checkPlayerWronglyTanked(event);
         }
     }
