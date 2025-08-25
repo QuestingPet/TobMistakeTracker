@@ -1,6 +1,7 @@
 package com.tobmistaketracker.detector.MistakeDetectors;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Actor;
 import net.runelite.api.NPC;
@@ -15,9 +16,10 @@ import java.util.Set;
 @Slf4j
 public class VerzikMeleeChancedTracker {
     @Getter
-    private final HashSet<Player> playersThatChancedMelee = new HashSet<>();
+    @Setter
+    private String playerThatChancedMelee;
 
-    private Player lastTickTarget;
+    private String lastTickTarget;
     private WorldArea lastTickTargetArea;
     private WorldArea lastTickVerzikArea;
 
@@ -35,8 +37,8 @@ public class VerzikMeleeChancedTracker {
             Actor target = verzik.getInteracting();
             if (target instanceof Player)
             {
-                lastTickTarget = (Player) target;
-                lastTickTargetArea = lastTickTarget.getWorldArea();
+                lastTickTarget = target.getName();
+                lastTickTargetArea = target.getWorldArea();
                 lastTickVerzikArea = verzik.getWorldArea();
             }
             else
@@ -56,7 +58,7 @@ public class VerzikMeleeChancedTracker {
             {
                 if (isWronglyTanked(lastTickVerzikArea, lastTickTargetArea))
                 {
-                    playersThatChancedMelee.add(lastTickTarget);
+                    playerThatChancedMelee = lastTickTarget;
                 }
             }
         }
