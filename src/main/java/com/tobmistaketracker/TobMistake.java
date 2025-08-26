@@ -18,6 +18,7 @@ public enum TobMistake {
     DEATH_XARPUS("Xarpus Death", "death_xarpus.png", "I'm planking!"),
     DEATH_VERZIK("Verzik Death", "death_verzik.png", "I'm planking!"),
     MAIDEN_BLOOD("Maiden Blood", "maiden_blood.png", "I'm drowning in Maiden's blood!"),
+    MAIDEN_BLOOD_BLOB("Maiden Blood (Blob)", "maiden_blood_orb.png", "I'm gonna catch this blob!"),
     BLOAT_HAND("Bloat Hand", "bloat_hand.png", "I'm stunned!"),
     VERZIK_P2_BOUNCE("Verzik P2 Bounce", "verzik_p2_bounce.png", "Bye!"),
     VERZIK_P2_BOMB("Verzik P2 Bomb", "verzik_p2_bomb.png", "I'm eating cabbages!"),
