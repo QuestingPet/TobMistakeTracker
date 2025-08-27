@@ -6,6 +6,8 @@ import net.runelite.client.util.ImageUtil;
 
 import java.awt.image.BufferedImage;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public enum TobMistake {
@@ -22,7 +24,8 @@ public enum TobMistake {
     VERZIK_P2_BOUNCE("Verzik P2 Bounce", "verzik_p2_bounce.png", "Bye!"),
     VERZIK_P2_BOMB("Verzik P2 Bomb", "verzik_p2_bomb.png", "I'm eating cabbages!"),
     VERZIK_P2_ACID("Verzik P2 Acid", "verzik_p2_acid.png", "I can't count to four!"),
-    VERZIK_P3_MELEE("Verzik P3 Melee", "verzik_p3_melee.png", "I'm PKing my team!"),
+    VERZIK_P3_MELEE_TANKED("Verzik P3 Melee", "verzik_p3_melee.png", "I'm PKing my team!"),
+    VERZIK_P3_MELEE_CHANCED("Verzik P3 Melee", "verzik_p3_melee.png", "Was I lucky?"),
     VERZIK_P3_WEB("Verzik P3 Web", "verzik_p3_web.png", "I was stuck in a web!"),
     VERZIK_P3_PURPLE("Verzik P3 Purple Tornado", "verzik_p3_purple.png", "I'm healing Verzik!"),
     VERZIK_P3_MELEE_CHANCED("Melee chanced", "verzik_p3_melee.png", "Was I Lucky?");
@@ -30,6 +33,19 @@ public enum TobMistake {
 
     private static final Set<TobMistake> ROOM_DEATH_ENUMS = EnumSet.of(
             DEATH_MAIDEN, DEATH_BLOAT, DEATH_NYLOCAS, DEATH_SOTETSEG, DEATH_XARPUS, DEATH_VERZIK);
+
+    /**
+     * Mistakes that should actually be tracked as another mistake, but only defined above for their own chat messages
+     * For example, VERZIK_P3_MELEE_CHANCED is tracked as VERZIK_P3_MELEE_TANKED, but we want to show the chat message
+     * for both of them depending on the contextual situation determined by the detector.
+     * <p>
+     * It's a bit hacky, but meh.
+     */
+    private static final Map<TobMistake, TobMistake> REFERENCE_MISTAKES = new HashMap<TobMistake, TobMistake>() {
+        {
+            put(VERZIK_P3_MELEE_CHANCED, VERZIK_P3_MELEE_TANKED);
+        }
+    };
 
     @Getter
     @NonNull
@@ -54,5 +70,9 @@ public enum TobMistake {
 
     public static boolean isRoomDeath(TobMistake mistake) {
         return ROOM_DEATH_ENUMS.contains(mistake);
+    }
+
+    public static TobMistake getMistakeForTracking(TobMistake mistake) {
+        return REFERENCE_MISTAKES.getOrDefault(mistake, mistake);
     }
 }
