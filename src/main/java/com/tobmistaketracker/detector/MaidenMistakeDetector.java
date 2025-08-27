@@ -105,7 +105,7 @@ public class MaidenMistakeDetector extends BaseTobMistakeDetector {
     public List<TobMistake> detectMistakes(@NonNull TobRaider raider) {
         WorldPoint previousLocation = raider.getPreviousWorldLocation();
         if (!raider.isDead() && isOnBloodTile(previousLocation)) {
-            return isSpawnedBlood(previousLocation) ? Collections.singletonList(TobMistake.MAIDEN_BLOOD) : Collections.singletonList(TobMistake.MAIDEN_BLOOD_BLOB);
+            return isSpawnedBlood(previousLocation) ? Collections.singletonList(TobMistake.MAIDEN_BLOOD) : Collections.singletonList(TobMistake.MAIDEN_BLOOD_SPAWN);
         }
 
         return Collections.emptyList();
