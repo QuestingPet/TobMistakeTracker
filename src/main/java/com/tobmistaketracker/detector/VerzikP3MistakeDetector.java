@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.tobmistaketracker.TobBossNames;
 import com.tobmistaketracker.TobMistake;
 import com.tobmistaketracker.TobRaider;
+import com.tobmistaketracker.detector.MistakeDetectors.Records.MeleeChancedRecord;
 import com.tobmistaketracker.detector.MistakeDetectors.VerzikMeleeChancedTracker;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -90,10 +91,12 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
             mistakes.add(TobMistake.VERZIK_P3_PURPLE);
         }
 
-        String chancedMeleePlayer = verzikMeleeChancedTracker.getPlayerThatChancedMelee();
-        if (chancedMeleePlayer != null && chancedMeleePlayer.equals(raider.getName())) {
-            verzikMeleeChancedTracker.setPlayerThatChancedMelee(null);
-            mistakes.add(TobMistake.VERZIK_P3_MELEE_CHANCED);
+        MeleeChancedRecord chancedMeleePlayer = verzikMeleeChancedTracker.getMeleeChancedRecord();
+
+        if (chancedMeleePlayer != null && chancedMeleePlayer.playerName().equals(raider.getName())) {
+            TobMistake mistake = chancedMeleePlayer.wasMelee() ? TobMistake.VERZIK_P3_MELEE_TANKED : TobMistake.VERZIK_P3_MELEE_CHANCED;
+            verzikMeleeChancedTracker.setMeleeChancedRecord(null);
+            mistakes.add(mistake);
         }
 
         return mistakes;
@@ -104,8 +107,7 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
         activeWebTiles.removeAll(webTilesToRemove);
         webTilesToRemove.clear();
         playerNamesPurpled.clear();
-        verzikP3NPC = null;
-        verzikMeleeChancedTracker.setPlayerThatChancedMelee(null);
+        verzikMeleeChancedTracker.setMeleeChancedRecord(null);
     }
 
     @Subscribe
