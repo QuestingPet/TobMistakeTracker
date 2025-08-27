@@ -57,6 +57,10 @@ public class VerzikMeleeChancedTracker {
         }
     }
 
+    public void dispose(){
+        emptyTickData();
+    }
+
     private boolean isWronglyTanked(WorldArea verzikArea, WorldArea tankArea) {
         return !verzikArea.intersectsWith(tankArea) && verzikArea.distanceTo(tankArea) == 1;
     }
