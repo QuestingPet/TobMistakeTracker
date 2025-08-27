@@ -40,6 +40,9 @@ Coming Soon:
 ---
 
 ## Changes
+#### 2.5
+
+* Split up maiden blood tanked based on if it was tomato or thrown blood
 
 #### 2.4
 
