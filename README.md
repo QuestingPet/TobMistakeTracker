@@ -19,12 +19,12 @@ Current mistakes being tracked:
 * ![verzik_p2_bomb](src/main/resources/com/tobmistaketracker/verzik_p2_bomb.png) Getting bombed during **Verzik P2**
 * ![verzik_p2_acid](src/main/resources/com/tobmistaketracker/verzik_p2_acid.png) Stepping on acid during **Verzik P2**
 * ![verzik_p3_web](src/main/resources/com/tobmistaketracker/verzik_p3_web.png) Getting webbed during **Verzik P3**
+* ![verzik_p3_melee](src/main/resources/com/tobmistaketracker/verzik_p3_purple.png) Chancing a melee hit during **Verzik P3**
 * ![verzik_p3_purple](src/main/resources/com/tobmistaketracker/verzik_p3_purple.png) Taking a purple tornado during **Verzik P3**
 
 Coming Soon:
 
 * ![sot_mage_orb](src/main/resources/com/tobmistaketracker/sot_mage_orb.png) Taking damage from a **Soteseg** orb with no vengeance
-* ![verzik_p3_melee](src/main/resources/com/tobmistaketracker/verzik_p3_melee.png) Meleeing the team as the tank during **Verzik P3**
 * Other feature requests
 
 ---
