@@ -4,17 +4,14 @@ import com.google.common.annotations.VisibleForTesting;
 import com.tobmistaketracker.TobBossNames;
 import com.tobmistaketracker.TobMistake;
 import com.tobmistaketracker.TobRaider;
+import com.tobmistaketracker.detector.MistakeDetectors.Records.MeleeChancedRecord;
+import com.tobmistaketracker.detector.MistakeDetectors.VerzikMeleeChancedTracker;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.ActorDeath;
-import net.runelite.api.events.GameObjectDespawned;
-import net.runelite.api.events.GameObjectSpawned;
-import net.runelite.api.events.GraphicChanged;
-import net.runelite.api.events.NpcChanged;
-import net.runelite.api.events.NpcSpawned;
+import net.runelite.api.events.*;
 import net.runelite.client.eventbus.Subscribe;
 
 import javax.inject.Inject;
@@ -27,16 +24,17 @@ import java.util.Set;
 
 /**
  * Verzik P3 is also pretty straightforward -- detect for webs/purples and show them.
- *
+ * <p>
  * We are intentionally waiting until the web has *despawned* and checking if a player was standing on it in order
  * to combat any form of "cheating" where the mistake detection can be seen as a communication mechanic.
- *
+ * <p>
  * In the future, this will also add verzik melee for the player tanking, but we currently can't easily
  * detect when verzik is meleeing, unless the dev team unmask certain animations/graphics for P3.
  */
 @Slf4j
 @Singleton
 public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
+    private VerzikMeleeChancedTracker verzikMeleeChancedTracker = new VerzikMeleeChancedTracker();
 
     private static final Set<Integer> VERZIK_P3_IDS = Set.of(
             10835, // Entry
@@ -51,6 +49,7 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
     private final Set<WorldPoint> webTilesToRemove;
 
     private final Set<String> playerNamesPurpled;
+    private NPC verzikP3NPC;
 
     @Inject
     public VerzikP3MistakeDetector() {
@@ -65,12 +64,15 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
         activeWebTiles.clear();
         webTilesToRemove.clear();
         playerNamesPurpled.clear();
+        verzikMeleeChancedTracker.dispose();
+
+        verzikP3NPC = null;
     }
 
     @Override
     protected void computeDetectingMistakes() {
         if (!detectingMistakes && isAlreadySpawned()) {
-            detectingMistakes = true;
+            enableDetectingMistakes();
         }
     }
 
@@ -92,7 +94,12 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
             mistakes.add(TobMistake.VERZIK_P3_PURPLE);
         }
 
-        // TODO: Verzik melee if the animations become unmasked
+        MeleeChancedRecord chancedMeleePlayer = verzikMeleeChancedTracker.getMeleeChancedRecord();
+
+        if (chancedMeleePlayer != null && chancedMeleePlayer.playerName().equals(raider.getName())) {
+            TobMistake mistake = chancedMeleePlayer.wasMelee() ? TobMistake.VERZIK_P3_MELEE_TANKED : TobMistake.VERZIK_P3_MELEE_CHANCED;
+            mistakes.add(mistake);
+        }
 
         return mistakes;
     }
@@ -102,6 +109,7 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
         activeWebTiles.removeAll(webTilesToRemove);
         webTilesToRemove.clear();
         playerNamesPurpled.clear();
+        verzikMeleeChancedTracker.setMeleeChancedRecord(null);
     }
 
     @Subscribe
@@ -112,9 +120,23 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
     }
 
     @Subscribe
+    public void onGameTick(GameTick tick) {
+        if (verzikP3NPC != null) {
+            verzikMeleeChancedTracker.setVerzikAttackInfo(verzikP3NPC);
+        }
+    }
+
+    @Subscribe
+    public void onAnimationChanged(AnimationChanged event) {
+        if (event.getActor() instanceof NPC) {
+            verzikMeleeChancedTracker.checkPlayerWronglyTanked(event);
+        }
+    }
+
+    @Subscribe
     public void onNpcSpawned(NpcSpawned event) {
         if (!detectingMistakes && isVerzikP3(event.getNpc())) {
-            detectingMistakes = true;
+            enableDetectingMistakes();
         }
     }
 
@@ -136,7 +158,7 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
     @Subscribe
     public void onNpcChanged(NpcChanged event) {
         if (!detectingMistakes && isVerzikP3(event.getNpc())) {
-            detectingMistakes = true;
+            enableDetectingMistakes();
         }
     }
 
@@ -153,6 +175,15 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
 
     private static boolean isVerzikP3(NPC npc) {
         return TobBossNames.VERZIK.equals(npc.getName()) && VERZIK_P3_IDS.contains(npc.getId());
+    }
+
+    private void enableDetectingMistakes() {
+        detectingMistakes = true;
+
+        verzikP3NPC = client.getNpcs().stream()
+                .filter(VerzikP3MistakeDetector::isVerzikP3)
+                .findFirst()
+                .orElse(null);
     }
 
     @VisibleForTesting
