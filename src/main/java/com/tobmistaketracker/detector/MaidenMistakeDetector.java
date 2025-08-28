@@ -103,8 +103,9 @@ public class MaidenMistakeDetector extends BaseTobMistakeDetector {
 
     @Override
     public List<TobMistake> detectMistakes(@NonNull TobRaider raider) {
-        if (!raider.isDead() && isOnBloodTile(raider.getPreviousWorldLocation())) {
-            return Collections.singletonList(TobMistake.MAIDEN_BLOOD);
+        WorldPoint previousLocation = raider.getPreviousWorldLocation();
+        if (!raider.isDead() && isOnBloodTile(previousLocation)) {
+            return isSpawnedBlood(previousLocation) ? Collections.singletonList(TobMistake.MAIDEN_BLOOD) : Collections.singletonList(TobMistake.MAIDEN_BLOOD_SPAWN);
         }
 
         return Collections.emptyList();
@@ -115,6 +116,10 @@ public class MaidenMistakeDetector extends BaseTobMistakeDetector {
         // Remove the blood spawn blood tiles *after* detecting this tick, so that it's still around for detection.
         bloodSpawnBloodTiles.removeAll(bloodSpawnBloodTilesToRemove);
         bloodSpawnBloodTilesToRemove.clear();
+    }
+
+    private boolean isSpawnedBlood(WorldPoint worldPoint) {
+        return maidenBloodTiles.contains(worldPoint);
     }
 
     private boolean isOnBloodTile(WorldPoint worldPoint) {
