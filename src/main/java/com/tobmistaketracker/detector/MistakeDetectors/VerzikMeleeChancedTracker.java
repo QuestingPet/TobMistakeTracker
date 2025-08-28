@@ -1,8 +1,8 @@
 package com.tobmistaketracker.detector.MistakeDetectors;
 
-import com.tobmistaketracker.detector.MistakeDetectors.Records.MeleeChancedRecord;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Actor;
 import net.runelite.api.NPC;
@@ -15,9 +15,17 @@ import java.util.Set;
 
 @Slf4j
 public class VerzikMeleeChancedTracker {
+
+    @Value
+    public static class MeleeChanceData {
+
+        String playerName;
+        boolean wasMelee;
+    }
+
     @Getter
     @Setter
-    private MeleeChancedRecord meleeChancedRecord;
+    private MeleeChanceData meleeChanceData;
 
     private String lastTickTarget;
     private WorldArea lastTickTargetArea;
@@ -51,7 +59,7 @@ public class VerzikMeleeChancedTracker {
             if (lastTickTarget != null && lastTickTargetArea != null && lastTickVerzikArea != null) {
                 if (isWronglyTanked(lastTickVerzikArea, lastTickTargetArea)) {
                     boolean wasMelee = AnimationID.VERZIK_PHASE3_ATTACK_MELEE == animationId;
-                    meleeChancedRecord = new MeleeChancedRecord(lastTickTarget, wasMelee);
+                    meleeChanceData = new MeleeChanceData(lastTickTarget, wasMelee);
                 }
             }
         }

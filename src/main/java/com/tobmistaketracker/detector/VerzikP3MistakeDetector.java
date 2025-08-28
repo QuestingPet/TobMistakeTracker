@@ -4,14 +4,21 @@ import com.google.common.annotations.VisibleForTesting;
 import com.tobmistaketracker.TobBossNames;
 import com.tobmistaketracker.TobMistake;
 import com.tobmistaketracker.TobRaider;
-import com.tobmistaketracker.detector.MistakeDetectors.Records.MeleeChancedRecord;
 import com.tobmistaketracker.detector.MistakeDetectors.VerzikMeleeChancedTracker;
+import com.tobmistaketracker.detector.MistakeDetectors.VerzikMeleeChancedTracker.MeleeChanceData;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.*;
+import net.runelite.api.events.ActorDeath;
+import net.runelite.api.events.AnimationChanged;
+import net.runelite.api.events.GameObjectDespawned;
+import net.runelite.api.events.GameObjectSpawned;
+import net.runelite.api.events.GameTick;
+import net.runelite.api.events.GraphicChanged;
+import net.runelite.api.events.NpcChanged;
+import net.runelite.api.events.NpcSpawned;
 import net.runelite.client.eventbus.Subscribe;
 
 import javax.inject.Inject;
@@ -94,10 +101,11 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
             mistakes.add(TobMistake.VERZIK_P3_PURPLE);
         }
 
-        MeleeChancedRecord chancedMeleePlayer = verzikMeleeChancedTracker.getMeleeChancedRecord();
-
-        if (chancedMeleePlayer != null && chancedMeleePlayer.playerName().equals(raider.getName())) {
-            TobMistake mistake = chancedMeleePlayer.wasMelee() ? TobMistake.VERZIK_P3_MELEE_TANKED : TobMistake.VERZIK_P3_MELEE_CHANCED;
+        MeleeChanceData chancedMeleePlayer = verzikMeleeChancedTracker.getMeleeChanceData();
+        if (chancedMeleePlayer != null && chancedMeleePlayer.getPlayerName().equals(raider.getName())) {
+            TobMistake mistake = chancedMeleePlayer.isWasMelee() ?
+                    TobMistake.VERZIK_P3_MELEE_TANKED :
+                    TobMistake.VERZIK_P3_MELEE_CHANCED;
             mistakes.add(mistake);
         }
 
@@ -109,7 +117,7 @@ public class VerzikP3MistakeDetector extends BaseTobMistakeDetector {
         activeWebTiles.removeAll(webTilesToRemove);
         webTilesToRemove.clear();
         playerNamesPurpled.clear();
-        verzikMeleeChancedTracker.setMeleeChancedRecord(null);
+        verzikMeleeChancedTracker.setMeleeChanceData(null);
     }
 
     @Subscribe
