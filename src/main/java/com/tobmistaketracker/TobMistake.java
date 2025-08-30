@@ -27,6 +27,7 @@ public enum TobMistake {
     VERZIK_P2_ACID("Verzik P2 Acid", "verzik_p2_acid.png", "I can't count to four!"),
     VERZIK_P3_MELEE_TANKED("Verzik P3 Melee", "verzik_p3_melee.png", "I'm PKing my team!"),
     VERZIK_P3_MELEE_CHANCED("Verzik P3 Melee", "verzik_p3_melee.png", "Was I lucky?"),
+    VERZIK_P3_MELEE_TEAMMATE("Verzik P3 Melee", "verzik_p3_melee.png", "I'm being PK'd!"),
     VERZIK_P3_WEB("Verzik P3 Web", "verzik_p3_web.png", "I was stuck in a web!"),
     VERZIK_P3_PURPLE("Verzik P3 Purple Tornado", "verzik_p3_purple.png", "I'm healing Verzik!");
 
@@ -46,6 +47,9 @@ public enum TobMistake {
             put(VERZIK_P3_MELEE_CHANCED, VERZIK_P3_MELEE_TANKED);
         }
     };
+    private static final EnumSet<TobMistake> CHAT_ONLY_MISTAKES = EnumSet.of(
+            VERZIK_P3_MELEE_TEAMMATE
+    );
 
     @Getter
     @NonNull
@@ -73,6 +77,10 @@ public enum TobMistake {
     }
 
     public static TobMistake getMistakeForTracking(TobMistake mistake) {
+        if (CHAT_ONLY_MISTAKES.contains(mistake)) {
+            return null;
+        }
+
         return REFERENCE_MISTAKES.getOrDefault(mistake, mistake);
     }
 }

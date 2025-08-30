@@ -204,7 +204,9 @@ public class TobMistakeTrackerPlugin extends Plugin {
                 }
 
                 TobMistake mistakeForTracking = TobMistake.getMistakeForTracking(mistake);
-                addMistakeForPlayer(raider.getName(), mistakeForTracking);
+                if (mistakeForTracking != null) {
+                    addMistakeForPlayer(raider.getName(), mistakeForTracking);
+                }
                 addChatMessageForPlayerMistake(raider.getPlayer(), mistake);
             }
         }
