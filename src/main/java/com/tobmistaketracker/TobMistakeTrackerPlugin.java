@@ -25,6 +25,7 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.ClientToolbar;
@@ -57,6 +58,7 @@ import static net.runelite.api.widgets.InterfaceID.TOB;
 public class TobMistakeTrackerPlugin extends Plugin {
 
     static final String CONFIG_GROUP = "tobMistakeTracker";
+    static final String SHOW_SIDE_PANEL_CONFIG_KEY = "showSidePanel";
     public static final int TOB_ROOM_TRANSITION_SCRIPT_ID = 2315;
 
     private static final int TOB_BOSS_INTERFACE_ID = 1;
@@ -124,7 +126,8 @@ public class TobMistakeTrackerPlugin extends Plugin {
         // Can't @Inject because we null it out in shutdown()
         panel = injector.getInstance(TobMistakeTrackerPanel.class);
 
-        // Add panel and icon
+        // Build panel and icon. It's only added to the toolbar if the config is enabled -- we always keep the panel
+        // itself around so that mistakes are still tracked while it's hidden.
         panel.loadHeaderIcon(icon);
         navButton = NavigationButton.builder()
                 .tooltip("Tob Mistake Tracker")
@@ -132,7 +135,7 @@ public class TobMistakeTrackerPlugin extends Plugin {
                 .priority(5)
                 .panel(panel)
                 .build();
-        clientToolbar.addNavigation(navButton);
+        updateSidePanel();
 
         // Reset all state
         resetRaidState();
@@ -154,6 +157,21 @@ public class TobMistakeTrackerPlugin extends Plugin {
 
         clientToolbar.removeNavigation(navButton);
         panel = null;
+    }
+
+    private void updateSidePanel() {
+        if (config.showSidePanel()) {
+            clientToolbar.addNavigation(navButton);
+        } else {
+            clientToolbar.removeNavigation(navButton);
+        }
+    }
+
+    @Subscribe
+    public void onConfigChanged(ConfigChanged event) {
+        if (CONFIG_GROUP.equals(event.getGroup()) && SHOW_SIDE_PANEL_CONFIG_KEY.equals(event.getKey())) {
+            updateSidePanel();
+        }
     }
 
     private void resetRaidState() {

@@ -28,4 +28,15 @@ public interface TobMistakeTrackerConfig extends Config {
     default boolean showMistakesOnOverheadText() {
         return true;
     }
+
+    @ConfigItem(
+            keyName = TobMistakeTrackerPlugin.SHOW_SIDE_PANEL_CONFIG_KEY,
+            name = "Show Side Panel",
+            description = "Whether or not to show the Tob Mistake Tracker side panel. Mistakes are still tracked " +
+                    "while the side panel is hidden.",
+            position = 3
+    )
+    default boolean showSidePanel() {
+        return true;
+    }
 }

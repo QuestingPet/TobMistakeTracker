@@ -8,7 +8,8 @@ other raiders while you're spectating.
 
 By default, when detecting a mistake, all players with this plugin will receive a public message of the mistake, a
 chat overhead above the player who made the mistake, and the mistake will be added to the Tob Mistake Tracker
-side-panel.
+side-panel. The side panel can be hidden with the `Show Side Panel` config -- mistakes are still tracked while it's
+hidden.
 
 Current mistakes being tracked:
 
@@ -40,6 +41,10 @@ Coming Soon:
 ---
 
 ## Changes
+#### 2.7
+
+* Add config for toggling the side panel
+
 #### 2.6
 
 * Split up maiden blood tanked based on if it was tomato or thrown blood
